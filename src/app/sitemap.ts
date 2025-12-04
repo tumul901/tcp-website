@@ -68,12 +68,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (response.ok) {
         const portfolioItems = await response.json();
         
-        portfolioRoutes = portfolioItems.map((item: any) => ({
-          url: `${baseUrl}/portfolio/${item.id}`,
-          lastModified: item.updated_at ? new Date(item.updated_at) : new Date(),
-          changeFrequency: 'monthly' as const,
-          priority: 0.7,
-        }));
+        if (Array.isArray(portfolioItems)) {
+          portfolioRoutes = portfolioItems.map((item: any) => ({
+            url: `${baseUrl}/portfolio/${item.id}`,
+            lastModified: item.updated_at ? new Date(item.updated_at) : new Date(),
+            changeFrequency: 'monthly' as const,
+            priority: 0.7,
+          }));
+        }
       }
     }
   } catch (error) {

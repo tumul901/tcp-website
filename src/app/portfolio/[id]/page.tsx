@@ -64,11 +64,11 @@ async function getProject(id: string): Promise<PortfolioItem | null> {
         if (!["youtube", "vimeo", "image", "pdf"].includes(type)) return null;
         return { type, url, caption: d.caption };
       })
-      .filter(Boolean);
+      .filter(Boolean) as { type: "youtube" | "vimeo" | "image" | "pdf"; url: string; caption: any }[];
 
     // Fallback: if no details, use main image as a single image media
     if (mainMedia.length === 0 && apiData.image) {
-      mainMedia = [{ type: "image", url: apiData.image }];
+      mainMedia = [{ type: "image", url: apiData.image, caption: "" }];
     }
 
     return {

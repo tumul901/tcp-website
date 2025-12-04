@@ -97,22 +97,20 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png', // TODO: Create this if not exists
   },
   
-  // Viewport configuration
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-  },
-  
-  // Theme color for mobile browsers
-  themeColor: '#0D0D0D',
-  
   // Verification tags (add when available)
   // verification: {
   //   google: 'your-google-verification-code',
   //   yandex: 'your-yandex-verification-code',
   //   bing: 'your-bing-verification-code',
   // },
+};
+
+// Viewport configuration - Separated per Next.js 15+ requirements
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#0D0D0D',
 };
 
 export default function RootLayout({
