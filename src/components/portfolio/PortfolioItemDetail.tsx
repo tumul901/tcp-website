@@ -8,6 +8,7 @@ import React, {
   useRef,
 } from "react";
 import Link from "next/link";
+import { motion, Variants } from "framer-motion";
 
 // --- TYPE DEFINITIONS ---
 
@@ -419,10 +420,43 @@ export default function PortfolioItemDetail({ project }: PortfolioItemDetailProp
     }
   }, [project]);
 
+  // Animation variants
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+      },
+    },
+  };
+
   return (
-    <main className="pt-20 min-h-screen flex flex-col items-center relative z-10 font-inter text-white overflow-x-hidden">
+    <motion.main 
+      className="pt-20 min-h-screen flex flex-col items-center relative z-10 font-inter text-white overflow-x-hidden"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       {/* Project Header */}
-      <section className="w-full max-w-7xl px-4 py-12 text-center">
+      <motion.section 
+        className="w-full max-w-7xl px-4 py-12 text-center"
+        variants={itemVariants}
+      >
         {/* Back Button */}
         <div className="mb-8 flex justify-center w-full max-w-2xl mx-auto">
           <button
@@ -457,24 +491,32 @@ export default function PortfolioItemDetail({ project }: PortfolioItemDetailProp
             Category: {project.category}
           </h2>
         </div>
-      </section>
+      </motion.section>
 
       {/* Media Content (Dynamic Rendering based on media type) */}
-      <section className="w-full">{mediaToRender}</section>
+      <motion.section 
+        className="w-full"
+        variants={itemVariants}
+      >
+        {mediaToRender}
+      </motion.section>
 
       {/* Description Section */}
       {project.description && (
-        <section className="w-full max-w-2xl mx-auto px-4 py-12">
+        <motion.section 
+          className="w-full max-w-2xl mx-auto px-4 py-12"
+          variants={itemVariants}
+        >
           <h3 className="text-2xl font-bold mb-4 text-center text-gray-300">
             Project Overview
           </h3>
           <p className="text-lg text-gray-400 leading-relaxed text-center">
             {project.description}
           </p>
-        </section>
+        </motion.section>
       )}
 
       <div className="pb-20"></div>
-    </main>
+    </motion.main>
   );
 }

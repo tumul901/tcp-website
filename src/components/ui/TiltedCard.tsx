@@ -1,3 +1,5 @@
+"use client";
+
 import type { SpringOptions } from 'motion/react';
 import { useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring } from 'motion/react';
@@ -123,7 +125,7 @@ export default function TiltedCard({
         }}
       >
        <Image
-  src={imageSrc}
+  src={imageSrc as string}
   alt={altText}
   width={typeof imageWidth === 'string' ? parseInt(imageWidth.replace('px','')) : typeof imageWidth === 'number' ? imageWidth : 300}
   height={typeof imageHeight === 'string' ? parseInt(imageHeight.replace('px','')) : typeof imageHeight === 'number' ? imageHeight : 300}
