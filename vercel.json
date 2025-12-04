@@ -1,7 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "startCommand": "npm run start",
   "builds": [
     {
       "src": "api/index.js",
