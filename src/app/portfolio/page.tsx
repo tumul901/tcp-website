@@ -272,7 +272,7 @@ export default function PortfolioPage() {
     (async () => {
       setIsLoadingCategories(true);
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
+        const res = await fetch(`/api/categories`);
         const data = await res.json();
         if (!mounted) return;
         if (Array.isArray(data)) {
@@ -324,7 +324,7 @@ export default function PortfolioPage() {
      Utility: build query params for API call
      ------------------------- */
   const buildApiUrl = useCallback((pageNum: number) => {
-    const base = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio`;
+    const base = `/api/portfolio`;
     const params = new URLSearchParams();
     params.set("page", String(pageNum));
     params.set("limit", String(ITEMS_PER_PAGE)); // if your backend uses limit param (safe to include)

@@ -27,7 +27,7 @@ interface ApiPortfolioItem {
 // --- DATA FETCHING ---
 
 async function getProject(id: string): Promise<PortfolioItem | null> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const apiUrl = '';
   
   try {
     const res = await fetch(`${apiUrl}/api/portfolio/${id}`, {
