@@ -27,7 +27,7 @@ interface ApiPortfolioItem {
 // --- DATA FETCHING ---
 
 async function getProject(id: string): Promise<PortfolioItem | null> {
-  const apiUrl = '';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
   
   try {
     const res = await fetch(`${apiUrl}/api/portfolio/${id}`, {
@@ -64,11 +64,11 @@ async function getProject(id: string): Promise<PortfolioItem | null> {
         if (!["youtube", "vimeo", "image", "pdf"].includes(type)) return null;
         return { type, url, caption: d.caption };
       })
-      .filter(Boolean) as { type: "youtube" | "vimeo" | "image" | "pdf"; url: string; caption: any }[];
+      .filter((item): item is NonNullable<typeof item> => item !== null);
 
     // Fallback: if no details, use main image as a single image media
     if (mainMedia.length === 0 && apiData.image) {
-      mainMedia = [{ type: "image", url: apiData.image, caption: "" }];
+      mainMedia = [{ type: "image", url: apiData.image, caption: undefined }];
     }
 
     return {

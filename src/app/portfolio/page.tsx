@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback, useRef, Fragment } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef, Fragment  } from "react";
 import Link from "next/link";
 import AnimatedText from "@/components/AnimatedText/AnimatedText";
 import GlassCard from "@/components/ui/GlassCard/GlassCard";
@@ -15,6 +15,44 @@ const MIN_CHARS = 2;
 const DEBOUNCE_DELAY_MS = 1000;
 const ITEMS_PER_PAGE = 9;
 
+interface MockItem {
+  id: number;
+  title: string;
+  category: string;
+  imageUrl: string;
+  date: string;
+}
+// const MOCK_PORTFOLIO_DATA: MockItem[] = [
+//   { id: 1, title: "The CloudPlay Showreel", category: "Animation", imageUrl: "hero-carousel/slide1.jpg", date: "2023-10-25" },
+//   { id: 2, title: "HSBC Mastercard", category: "Event Content", imageUrl: "hero-carousel/slide4.jpg", date: "2023-10-20" },
+//   { id: 3, title: "HSBC Emerge", category: "Event Design", imageUrl: "hero-carousel/slide3.png", date: "2023-10-15" },
+//   { id: 4, title: "AMD", category: "Event Design", imageUrl: "https://placehold.co/600x400/1e293b/cbd5e1?text=AMD", date: "2023-10-10" },
+//   { id: 5, title: "Volvo Product launch musical AV", category: "3D, Anamorphic, CGI & VFX", imageUrl: "https://placehold.co/600x400/1e293b/cbd5e1?text=Volvo+AV", date: "2023-10-05" },
+//   { id: 6, title: "AstraZeneca product AV", category: "Animation", imageUrl: "https://placehold.co/600x400/1e293b/cbd5e1?text=AstraZeneca+AV", date: "2023-09-30" },
+//   { id: 7, title: "AstraZeneca launch", category: "Event Content", imageUrl: "https://placehold.co/600x400/1e293b/cbd5e1?text=AstraZeneca+Launch", date: "2023-09-25" },
+//   { id: 8, title: "Nestle SS Conclave 2025 Post event AV", category: "Event Design", imageUrl: "https://placehold.co/600x400/1e293b/cbd5e1?text=Nestle+AV", date: "2023-09-20" },
+//   { id: 9, title: "Sabha Post event AV", category: "3D, Anamorphic, CGI & VFX", imageUrl: "https://placehold.co/600x400/1e293b/cbd5e1?text=Sabha+AV", date: "2023-09-15" },
+//   { id: 10, title: "Project Echo Alpha", category: "Games", imageUrl: "https://placehold.co/600x400/0f172a/94a3b8?text=Echo+Alpha", date: "2023-09-10" },
+//   { id: 11, title: "Project Beta Bridge", category: "Home Look", imageUrl: "https://placehold.co/600x400/0f172a/94a3b8?text=Beta+Bridge", date: "2023-09-05" },
+//   { id: 12, title: "Project Gamma Tower", category: "Presentation Design", imageUrl: "https://placehold.co/600x400/0f172a/94a3b8?text=Gamma+Tower", date: "2023-09-01" },
+//   { id: 13, title: "Project Delta Dash", category: "Event Design", imageUrl: "https://placehold.co/600x400/0f172a/94a3b8?text=Delta+Dash", date: "2023-08-28" },
+// ];
+
+/* -------------------------
+   Interface matching backend schema
+   Prisma model:
+   model PortfolioItem {
+     id Int
+     title String
+     category_id Int
+     category_name String?
+     details Json
+     description String?
+     image String
+     created_at DateTime
+     updated_at DateTime
+   }
+   ------------------------- */
 interface PortfolioItem {
   id: number;
   title: string;
@@ -30,10 +68,9 @@ interface PortfolioItem {
 /* -------------------------
    Presentational components (memoized)
    ------------------------- */
-const PortfolioItemCard: React.FC<{ item: PortfolioItem; index: number }> = React.memo(({ item }) => {
+const PortfolioItemCard: React.FC<{ item: PortfolioItem }> = React.memo(({ item }) => {
   const imageSrc = item.image || "https://placehold.co/600x224/1e293b/cbd5e1?text=Project+Image";
   const categoryLabel = item.category_name || "Uncategorized";
-  
   return (
     <Link
       href={`/portfolio/${item.id}`}
@@ -100,13 +137,14 @@ const FilterBar: React.FC<FilterBarProps> = React.memo(({
     onSearchInputChange(e.target.value);
   }, [onSearchInputChange]);
 
-  // --- Data for the Listbox ---
+  // --- NEW: Data for the Listbox ---
   const sortOptions = [
     { id: 'latest', name: 'Latest' },
     { id: 'az', name: 'A to Z' },
     { id: 'za', name: 'Z to A' },
   ];
   const selectedOption = sortOptions.find(option => option.id === sortBy) || sortOptions[0];
+  // --- END NEW ---
 
   return (
     <div className="w-full max-w-7xl px-4 lg:px-0 mx-auto mb-8 sm:mb-12">
@@ -121,7 +159,27 @@ const FilterBar: React.FC<FilterBarProps> = React.memo(({
           />
         </GlassCard>
 
-        {/* Replaced <select> with <Listbox> */}
+        {/* <div className="relative w-full sm:w-1/3 lg:w-1/3 group">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className={`
+              block appearance-none w-full text-gray-200 py-3 px-4 pr-8 rounded-lg leading-tight transition duration-150 cursor-pointer
+              bg-white/5 backdrop-blur-md border border-white/5 shadow-xl hover:border-white/20
+            `}
+          >
+            <option value="latest" className="bg-gray-900 text-gray-200">Latest</option>
+            <option value="az" className="bg-gray-900 text-gray-200">A to Z</option>
+            <option value="za" className="bg-gray-900 text-gray-200">Z to A</option>
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400 group-hover:text-[#00A859] transition duration-150">
+            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+            </svg>
+          </div>
+        </div> */}
+
+        {/* --- MODIFICATION START: Replaced <select> with <Listbox> --- */}
         <div className="relative w-full sm:w-1/3 lg:w-1/3">
           <Listbox value={sortBy} onChange={setSortBy}>
             <div className="relative">
@@ -182,6 +240,7 @@ const FilterBar: React.FC<FilterBarProps> = React.memo(({
             </div>
           </Listbox>
         </div>
+        {/* --- MODIFICATION END --- */}
       </div>
 
       <GlassCard className="rounded-xl shadow-2xl p-4 sm:p-6">
@@ -216,7 +275,6 @@ FilterBar.displayName = "FilterBar";
 /* -------------------------
    Main Page component
    ------------------------- */
-
 export default function PortfolioPage() {
   // categories and loading
   const [categories, setCategories] = useState<CategoryType[]>([{ id: 1, name: "All" }]); 
@@ -272,7 +330,7 @@ export default function PortfolioPage() {
     (async () => {
       setIsLoadingCategories(true);
       try {
-        const res = await fetch(`/api/categories`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
         const data = await res.json();
         if (!mounted) return;
         if (Array.isArray(data)) {
@@ -324,7 +382,7 @@ export default function PortfolioPage() {
      Utility: build query params for API call
      ------------------------- */
   const buildApiUrl = useCallback((pageNum: number) => {
-    const base = `/api/portfolio`;
+    const base = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio`;
     const params = new URLSearchParams();
     params.set("page", String(pageNum));
     params.set("limit", String(ITEMS_PER_PAGE)); // if your backend uses limit param (safe to include)
@@ -429,6 +487,9 @@ export default function PortfolioPage() {
     return found ? found.name : "All";
   }, [categories, activeCategoryId]);
 
+  /* -------------------------
+     Render
+     ------------------------- */
   return (
     <main className="pt-16 sm:pt-20 min-h-screen flex flex-col items-center px-4 relative text-white font-inter">
       <section className="mb-6 sm:mb-8 p-4 pt-8 sm:pt-12">
@@ -438,18 +499,16 @@ export default function PortfolioPage() {
         />
       </section>
 
-      <div className="w-full flex justify-center">
-        <FilterBar
-          searchTermInput={searchTermInput}
-          onSearchInputChange={setSearchTermInput}
-          activeCategoryId={activeCategoryId}
-          setActiveCategoryId={handleSetActiveCategory}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          categories={categories}
-          isLoadingCategories={isLoadingCategories}
-        />
-      </div>
+      <FilterBar
+        searchTermInput={searchTermInput}
+        onSearchInputChange={setSearchTermInput}
+        activeCategoryId={activeCategoryId}
+        setActiveCategoryId={handleSetActiveCategory}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        categories={categories}
+        isLoadingCategories={isLoadingCategories}
+      />
 
       <section className="w-full max-w-7xl px-4 lg:px-0 mx-auto">
         {items.length === 0 && !isLoading && (
@@ -463,7 +522,7 @@ export default function PortfolioPage() {
           {/* If items empty while loading, show nothing (or you can show placeholders) */}
           {items.length === 0 && isLoading ? (
             // show mock placeholders (use the original MOCK to preserve look)
-            [0, 1, 2, 3, 4, 5].map((m, index) => (
+            [0, 9].map((m, index) => (
               <div key={`ph-${index}`} className="animate-pulse">
                 <GlassCard className="w-full h-full">
                   <div className="w-full h-48 bg-gray-800" />
@@ -475,9 +534,7 @@ export default function PortfolioPage() {
               </div>
             ))
           ) : (
-            items.map((item, index) => (
-              <PortfolioItemCard key={item.id} item={item} index={index} />
-            ))
+            items.map(item => <PortfolioItemCard key={item.id} item={item} />)
           )}
         </div>
 
